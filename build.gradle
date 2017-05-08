@@ -1,0 +1,45 @@
+group 'siosio'
+version '0.0.1'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+repositories {
+  mavenCentral()
+}
+
+configurations {
+  provided
+}
+
+dependencies {
+  // nablarch
+  compile 'com.nablarch.framework:nablarch-fw-web:1.4.0'
+  
+  // jcache
+  provided 'javax.cache:cache-api:1.0.0'
+  testCompile 'org.jsr107.ri:cache-ri-impl:1.0.0'
+  
+  // test framework
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0-M4'
+  testCompile 'org.assertj:assertj-core:3.7.0'
+  
+  // log
+  testRuntime 'org.slf4j:slf4j-simple:1.7.25'
+  testRuntime 'com.nablarch.integration:nablarch-slf4j-adaptor:1.0.0'
+}
+
+sourceSets {
+  main.compileClasspath += configurations.provided
+}
+
+idea {
+  module {
+    scopes.PROVIDED.plus += [configurations.provided]
+  }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '3.5'
+}
+
