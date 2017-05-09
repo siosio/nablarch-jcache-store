@@ -127,4 +127,60 @@ class SessionStoreHandlerTest {
         assertThat(sid!!.value)
             .isNotEqualTo(newSid!!.value)
     }
+
+    @Test
+    @RunAsClient
+    fun 複数セッション扱えること() {
+
+        val webTarget = ClientBuilder.newClient()
+            .target(deploymentUri)
+            .path("/testapp")
+
+        // session1
+        val sid1 = webTarget
+            .queryParam("c", "siosio.testapp.PutSession")
+            .request()
+            .get()
+            .cookies["NABLARCH_SID"]
+        
+        TimeUnit.SECONDS.sleep(4)
+        
+        // session2
+        val sid2 = webTarget
+            .queryParam("c", "siosio.testapp.PutSession")
+            .request()
+            .get()
+            .cookies["NABLARCH_SID"]
+        
+        assertThat(sid1!!.value!!)
+            .isNotEqualTo(sid2!!.value!!)
+        
+        TimeUnit.SECONDS.sleep(2)
+
+        val response = webTarget.queryParam("c", "siosio.testapp.NotFoundSession")
+            .request()
+            .cookie(sid1)
+            .get()
+        
+        assertThat(response)
+            .`as`("セッションタイムアウトによりセッションは取得できない")
+            .hasFieldOrPropertyWithValue("status", 200)
+
+        assertThat(response.cookies["NABLARCH_SID"])
+            .`as`("サーバ側で無効化されるのでクッキーが削除される")
+            .isNull()
+
+        val response2 = webTarget.queryParam("c", "siosio.testapp.GetSession")
+            .request()
+            .cookie(sid2)
+            .get()
+
+        assertThat(response2)
+            .`as`("正常に取得できる")
+            .hasFieldOrPropertyWithValue("status", 200)
+
+        assertThat(response2.cookies["NABLARCH_SID"])
+            .`as`("くっきーもかえされる")
+            .isNotNull()
+    }
 }

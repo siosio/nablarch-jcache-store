@@ -106,4 +106,28 @@ internal class JCacheStoreTest {
             .isEmpty()
 
     }
+
+    @Test
+    fun 複数のセッション情報をもてること() {
+        val context = ExecutionContext()
+
+        val entries = ArrayList<SessionEntry>()
+        entries.add(SessionEntry("キー", "あたい", sut))
+        entries.add(SessionEntry("objects", ArrayList<Any>(), sut))
+
+        sut.save("key", entries, context)
+        
+        TimeUnit.SECONDS.sleep(4)
+        sut.save("key2", entries, context)
+
+
+        TimeUnit.SECONDS.sleep(2)
+        assertThat(sut.load("key", context))
+            .`as`("timeoutしているのでストア上のデータは削除されていること")
+            .isEmpty()
+
+        assertThat(sut.load("key2", context))
+            .`as`("key2はタイムアウトしていないので取得できる")
+            .hasSize(2)
+    }
 }
