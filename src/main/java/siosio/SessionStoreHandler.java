@@ -47,7 +47,7 @@ public class SessionStoreHandler implements Handler<Object, Object> {
     private boolean cookieSecure = false;
 
     /** セッションの有効期限を保持するキャッシュ */
-    private final Cache<String, Long> EXPIRATION_DATE;
+    private final Cache<String, Long> expirationDate;
 
     /**
      * セッションがinvalidateされたことを示すフラグを
@@ -62,7 +62,7 @@ public class SessionStoreHandler implements Handler<Object, Object> {
     public SessionStoreHandler() {
         final CacheManager cacheManager = Caching.getCachingProvider()
                                                  .getCacheManager();
-        EXPIRATION_DATE = cacheManager.createCache("expirationDate", new MutableConfiguration<>());
+        expirationDate = cacheManager.createCache("expirationDate", new MutableConfiguration<>());
     }
 
     /**
@@ -123,7 +123,7 @@ public class SessionStoreHandler implements Handler<Object, Object> {
 
         final Object res = context.handleNext(data);
 
-        if (sessionId != null && EXPIRATION_DATE.get(sessionId) == null) {
+        if (sessionId != null && expirationDate.get(sessionId) == null) {
             // 往路処理でセッションが存在していたが、復路処理までの間にセッションが破棄された場合
             // セッションストアの保存処理は行わない。
             return res;
@@ -174,7 +174,7 @@ public class SessionStoreHandler implements Handler<Object, Object> {
      * @param sessionId セッションID
      */
     private void invalidateSession(final String sessionId) {
-        EXPIRATION_DATE.remove(sessionId);
+        expirationDate.remove(sessionId);
     }
 
     /**
@@ -192,8 +192,8 @@ public class SessionStoreHandler implements Handler<Object, Object> {
             }
         }
 
-        EXPIRATION_DATE.put(session.getId(), SystemTimeUtil.getTimestamp()
-                                                           .getTime() + maxAge);
+        expirationDate.put(session.getId(), SystemTimeUtil.getTimestamp()
+                                                          .getTime() + maxAge);
 
         setSessionTrackingCookie(session, context.getServletResponse());
     }
@@ -231,7 +231,7 @@ public class SessionStoreHandler implements Handler<Object, Object> {
         if (sessionId == null) {
             return null;
         }
-        if (!isValidExpirationDate(EXPIRATION_DATE.get(sessionId))) {
+        if (!isValidExpirationDate(expirationDate.get(sessionId))) {
             return null;
         }
         return sessionId;
