@@ -27,14 +27,14 @@ configurations {
 dependencies {
   // nablarch
   compile 'com.nablarch.framework:nablarch-fw-web:1.4.0'
-  
+
   // javaee
   provided 'javax:javaee-web-api:7.0'
-  
+
   // jcache
   provided 'javax.cache:cache-api:1.0.0'
   testCompile 'org.jsr107.ri:cache-ri-impl:1.0.0'
-  
+
   // test framework
   testCompile 'org.jmockit:jmockit:1.31'
   testCompile 'junit:junit:4.12'
@@ -48,6 +48,10 @@ dependencies {
   testRuntime 'org.slf4j:slf4j-simple:1.7.25'
   testRuntime 'com.nablarch.integration:nablarch-slf4j-adaptor:1.0.0'
   compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+}
+
+test {
+  testLogging.events 'skipped', 'passed', 'failed'
 }
 
 sourceSets {
