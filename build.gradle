@@ -20,19 +20,15 @@ repositories {
   mavenCentral()
 }
 
-configurations {
-  provided
-}
-
 dependencies {
   // nablarch
   compile 'com.nablarch.framework:nablarch-fw-web:1.4.1'
 
   // javaee
-  provided 'javax:javaee-web-api:7.0'
+  compileOnly 'javax:javaee-web-api:7.0'
 
   // jcache
-  provided 'javax.cache:cache-api:1.0.0'
+  compileOnly 'javax.cache:cache-api:1.0.0'
   testCompile 'org.jsr107.ri:cache-ri-impl:1.0.0'
 
   // test framework
@@ -54,18 +50,12 @@ test {
   testLogging.events 'skipped', 'passed', 'failed'
 }
 
-sourceSets {
-  main.compileClasspath += configurations.provided
-  test.compileClasspath += configurations.provided
-}
-
-idea {
-  module {
-    scopes.PROVIDED.plus += [configurations.provided]
-  }
+sourceSets.test {
+  compileClasspath += configurations.compileOnly
+  runtimeClasspath += configurations.compileOnly
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '4.0.1'
+  gradleVersion = '4.0.2'
 }
 

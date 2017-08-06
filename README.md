@@ -5,3 +5,6 @@ Nablarchの[セッションストア](https://nablarch.github.io/docs/LATEST/doc
 
 ## 使い方
 todo ・・・
+
+## ライセンス
+[LICENSE](https://github.com/siosio/nablarch-jcache-store/blob/develop/LICENSE)
